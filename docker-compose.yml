@@ -16,7 +16,7 @@ services:
       - postgres:postgres
     # the Flask app code will go into the `app` folder of your project and be mapped to `/usr/src/app` in the container
     volumes:
-      - ./todoapp:/usr/src/app
+      - ./app:/usr/src/app
     networks:
       - flask_network
     restart: unless-stopped
