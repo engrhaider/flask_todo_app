@@ -1,0 +1,56 @@
+version: '3.5'
+
+services:
+  web:
+    container_name: flask_web_container
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "80:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:Password01@postgres:5432/todoapp
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+    # the Flask app code will go into the `app` folder of your project and be mapped to `/usr/src/app` in the container
+    volumes:
+      - ./todoapp:/usr/src/app
+    networks:
+      - flask_network
+    restart: unless-stopped
+  postgres:
+    container_name: flask_postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Password01}
+      PGDATA: /data/postgres
+    volumes:
+      - ./docker/postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - flask_network
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: flask_pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-sone@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - ./docker/pgadmin:/var/lib/pgadmin
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - flask_network
+    restart: unless-stopped
+
+networks:
+  flask_network:
+    driver: bridge
