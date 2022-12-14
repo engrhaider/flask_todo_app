@@ -1,2 +1,3 @@
 ./docker/pgadmin
 ./docker/postgres
+.idea
